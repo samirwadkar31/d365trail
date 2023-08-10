@@ -100,5 +100,5 @@ jobs:
         solution-name: ${{ github.event.inputs.solution_name }}
         force-overwrite: true
         publish-changes: true
-        AsyncOperation: true
-        MaxAsyncWaitTime: '120'
+        async: true
+
