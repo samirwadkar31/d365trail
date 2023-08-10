@@ -31,6 +31,7 @@ env:
   ENVIRONMENT_URL: 'https://orgca11a9f7.crm.dynamics.com/'
   CLIENT_ID: '78c97a5e-105f-4945-96e8-f742d0ac3fef'
   TENANT_ID: '72f988bf-86f1-41af-91ab-2d7cd011db47'
+  HALOConsumerComplaintSystem.SOLUTION_VERSION: 1.0.0.0
 
 permissions:
   contents: write
@@ -53,6 +54,20 @@ jobs:
         client-secret: ${{ secrets.D365SECRET }}
         tenant-id: ${{env.TENANT_ID}}
 
+
+    - name: Set up PowerShell
+      uses: actions/setup-powershell@v2  # Action to set up PowerShell environment
+
+    - name: Run PowerShell script
+      run: 
+          Write-Host "$(BuildTools.EnvironmentUrl)"
+          Write-Host "Old Solution Version:${{env.HALOConsumerComplaintSystem.SOLUTION_VERSION}}"
+          $oldVersion = [version]"${{env.HALOConsumerComplaintSystem.SOLUTION_VERSION}}"
+          #Write-Host "Old Version: $oldVersion"
+          $newVersion = [version]::New($oldVersion.Major,$oldVersion.Minor,$oldVersion.Build,$oldVersion.Revision+1)
+          Write-Host "New Version: $newVersion"
+        
+        
     - name: Export solution as managed
       uses: microsoft/powerplatform-actions/export-solution@v0
       with:
