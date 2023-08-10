@@ -88,7 +88,18 @@ jobs:
       with:
         name: managedSolutions
         path: out/release/
-
+        
+    - name: Import solution to test env
+      uses: microsoft/powerplatform-actions/import-solution@v0
+      with:
+        environment-url: 'https://orgcd66acce.crm.dynamics.com/'
+        app-id: ${{env.CLIENT_ID}}
+        client-secret: ${{ secrets.D365SECRET }}
+        tenant-id: ${{env.TENANT_ID}}
+        solution-file: out/release/${{ github.event.inputs.solution_name }}.zip
+        force-overwrite: true
+        publish-changes: true
+        
     - name: Upgrade solution to test env
       uses: microsoft/powerplatform-actions/upgrade-solution@v0
       with:
