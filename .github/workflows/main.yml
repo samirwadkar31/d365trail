@@ -98,8 +98,6 @@ jobs:
         client-secret: ${{ secrets.D365SECRET }}
         tenant-id: ${{env.TENANT_ID}}
         solution-name: ${{ github.event.inputs.solution_name }}
-        force-overwrite: true
-        publish-changes: true
         async: true
         max-async-wait-time: '120'
 
