@@ -101,4 +101,5 @@ jobs:
         force-overwrite: true
         publish-changes: true
         async: true
+        max-async-wait-time: '120'
 
