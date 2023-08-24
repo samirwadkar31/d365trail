@@ -54,76 +54,73 @@ jobs:
         client-secret: ${{ secrets.D365SECRET }}
         tenant-id: ${{env.TENANT_ID}}
 
-
-    - name: Set up PowerShell
-      uses: actions/setup-powershell@v2  # Action to set up PowerShell environment
-
     - name: Run PowerShell script
+      shell: pwsh
       run: 
-          Write-Host "$(BuildTools.EnvironmentUrl)"
-          Write-Host "Old Solution Version:${{env.HALOConsumerComplaintSystem.SOLUTION_VERSION}}"
-          $oldVersion = [version]"${{env.HALOConsumerComplaintSystem.SOLUTION_VERSION}}"
-          #Write-Host "Old Version: $oldVersion"
-          $newVersion = [version]::New($oldVersion.Major,$oldVersion.Minor,$oldVersion.Build,$oldVersion.Revision+1)
-          Write-Host "New Version: $newVersion"
+        Write-Host "$(BuildTools.EnvironmentUrl)"
+        Write-Host "Old Solution Version: $(DemoAppTask.SOLUTION_VERSION)"
+        $oldVersion = [version]"$(HALOConsumerComplaintSystem.SOLUTION_VERSION)"
+        #Write-Host "Old Version: $oldVersion"
+        $newVersion = [version]::New($oldVersion.Major,$oldVersion.Minor,$oldVersion.Build,$oldVersion.Revision+1)
+        Write-Host "New Version: $newVersion"
         
         
-    - name: Export solution as managed
-      uses: microsoft/powerplatform-actions/export-solution@v0
-      with:
-        environment-url: ${{env.ENVIRONMENT_URL}}
-        app-id: ${{env.CLIENT_ID}}
-        client-secret: ${{ secrets.D365SECRET }}
-        tenant-id: ${{env.TENANT_ID}}
-        solution-name: ${{ github.event.inputs.solution_name }}
-        managed: true
-        solution-output-file: out/ship/${{ github.event.inputs.solution_name }}.zip
+  #   - name: Export solution as managed
+  #     uses: microsoft/powerplatform-actions/export-solution@v0
+  #     with:
+  #       environment-url: ${{env.ENVIRONMENT_URL}}
+  #       app-id: ${{env.CLIENT_ID}}
+  #       client-secret: ${{ secrets.D365SECRET }}
+  #       tenant-id: ${{env.TENANT_ID}}
+  #       solution-name: ${{ github.event.inputs.solution_name }}
+  #       managed: true
+  #       solution-output-file: out/ship/${{ github.event.inputs.solution_name }}.zip
 
-    - name: Upload the ready to ship solution to GH artifact store
-      uses: actions/upload-artifact@v2
-      with:
-        name: managedSolutions
-        path: out/ship/${{ github.event.inputs.solution_name }}.zip
+  #   - name: Upload the ready to ship solution to GH artifact store
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: managedSolutions
+  #       path: out/ship/${{ github.event.inputs.solution_name }}.zip
 
-  release-to-staging:
-    needs: [ convert-to-managed ]
-    runs-on: windows-latest
-    environment: 
-      name: TestEnv
-    env:
-      RUNNER_DEBUG: 1
+  # release-to-staging:
+  #   needs: [ convert-to-managed ]
+  #   runs-on: windows-latest
+  #   environment: 
+  #     name: TestEnv
+  #   env:
+  #     RUNNER_DEBUG: 1
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        lfs: true
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       lfs: true
 
-    - name: Fetch the ready to ship solution from GH artifact store
-      uses: actions/download-artifact@v2
-      with:
-        name: managedSolutions
-        path: out/release/
+  #   - name: Fetch the ready to ship solution from GH artifact store
+  #     uses: actions/download-artifact@v2
+  #     with:
+  #       name: managedSolutions
+  #       path: out/release/
         
-    - name: Import solution to test env
-      uses: microsoft/powerplatform-actions/import-solution@v0
-      with:
-        environment-url: 'https://orgcd66acce.crm.dynamics.com/'
-        app-id: ${{env.CLIENT_ID}}
-        client-secret: ${{ secrets.D365SECRET }}
-        tenant-id: ${{env.TENANT_ID}}
-        solution-file: out/release/${{ github.event.inputs.solution_name }}.zip
-        force-overwrite: true
-        publish-changes: true
-        import-as-holding: true
+  #   - name: Import solution to test env
+  #     uses: microsoft/powerplatform-actions/import-solution@v0
+  #     with:
+  #       environment-url: 'https://orgcd66acce.crm.dynamics.com/'
+  #       app-id: ${{env.CLIENT_ID}}
+  #       client-secret: ${{ secrets.D365SECRET }}
+  #       tenant-id: ${{env.TENANT_ID}}
+  #       solution-file: out/release/${{ github.event.inputs.solution_name }}.zip
+  #       force-overwrite: true
+  #       publish-changes: true
+  #       import-as-holding: true
         
-    - name: Upgrade solution to test env
-      uses: microsoft/powerplatform-actions/upgrade-solution@v0
-      with:
-        environment-url: 'https://orgcd66acce.crm.dynamics.com/'
-        app-id: ${{env.CLIENT_ID}}
-        client-secret: ${{ secrets.D365SECRET }}
-        tenant-id: ${{env.TENANT_ID}}
-        solution-name: ${{ github.event.inputs.solution_name }}
-        async: true
-        max-async-wait-time: 120
+  #   - name: Upgrade solution to test env
+  #     uses: microsoft/powerplatform-actions/upgrade-solution@v0
+  #     with:
+  #       environment-url: 'https://orgcd66acce.crm.dynamics.com/'
+  #       app-id: ${{env.CLIENT_ID}}
+  #       client-secret: ${{ secrets.D365SECRET }}
+  #       tenant-id: ${{env.TENANT_ID}}
+  #       solution-name: ${{ github.event.inputs.solution_name }}
+  #       async: true
+  #       max-async-wait-time: 120
 
