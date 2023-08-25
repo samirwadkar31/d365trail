@@ -58,10 +58,10 @@ jobs:
       shell: pwsh
       run: |
         Install-Module -Name Microsoft.Xrm.Data.PowerShell -Confirm:$false -Verbose -Force
-        $conn = Get-CrmConnection -ConnectionString "AuthType=ClientSecret; Url=${{ env.environmentUrl }}; ClientId=${{ env.applicationId }}; ClientSecret=${{ secrets.cds }}"
+        $conn = Get-CrmConnection -ConnectionString "AuthType=ClientSecret; Url=${{ env.ENVIRONMENT_URL }}; ClientId=${{ env.CLIENT_ID }}; ClientSecret=${{ secrets.D365SECRET }}"
         $version = "$([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), '${{ env.timeZone }}').ToString("yyyy.MM.dd")).${{ github.run_number }}";
         echo "::set-output name=solutionVersion::$version"          
-        Set-CrmSolutionVersionNumber -SolutionName ${{ env.solution }} -VersionNumber $version
+        Set-CrmSolutionVersionNumber -SolutionName ${{ github.event.inputs.solution_name }} -VersionNumber $version
         
         
   #   - name: Export solution as managed
